@@ -3,8 +3,8 @@ package com.library.management.system.service;
 import com.library.management.system.dto.book.BookDTO;
 import com.library.management.system.dto.book.UpdateBookDTO;
 import com.library.management.system.entity.Book;
-import com.library.management.system.exception.AuthorNotFoundException;
-import com.library.management.system.exception.BookNotFoundException;
+import com.library.management.system.exception.InvalidAuthorException;
+import com.library.management.system.exception.InvalidBookException;
 import com.library.management.system.mapper.BookMapper;
 import com.library.management.system.repository.AuthorRepository;
 import com.library.management.system.repository.BookRepository;
@@ -23,7 +23,7 @@ public class BookService {
     private final BookMapper bookMapper;
 
     public BookDTO save(BookDTO bookDTO) {
-        var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.BAD_REQUEST.value()));
+        var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new InvalidAuthorException(HttpStatus.BAD_REQUEST.value()));
 
         var book = bookMapper.toEntity(bookDTO);
         book.setAuthor(author);
@@ -34,7 +34,7 @@ public class BookService {
     }
 
     public BookDTO update(String bookId, BookDTO bookDTO) {
-        var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.BAD_REQUEST.value()));
+        var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new InvalidAuthorException(HttpStatus.BAD_REQUEST.value()));
 
         var bookOptional = bookRepository.findById(bookId);
 
@@ -54,7 +54,7 @@ public class BookService {
     }
 
     public BookDTO patch(String bookId, UpdateBookDTO bookDTO) {
-        var book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(HttpStatus.NOT_FOUND.value()));
+        var book = bookRepository.findById(bookId).orElseThrow(() -> new InvalidBookException(HttpStatus.NOT_FOUND.value()));
 
         if (bookDTO.getTitle() != null) {
             book.setTitle(bookDTO.getTitle());
@@ -67,7 +67,7 @@ public class BookService {
         }
 
         if (bookDTO.getAuthorId() != null) {
-            var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.BAD_REQUEST.value()));
+            var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new InvalidAuthorException(HttpStatus.BAD_REQUEST.value()));
             book.setAuthor(author);
         }
 
@@ -83,7 +83,7 @@ public class BookService {
     }
 
     public BookDTO getById(String id) {
-        var book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(HttpStatus.NOT_FOUND.value()));
+        var book = bookRepository.findById(id).orElseThrow(() -> new InvalidBookException(HttpStatus.NOT_FOUND.value()));
         return bookMapper.toDTO(book);
     }
 }

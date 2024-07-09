@@ -1,8 +1,8 @@
 package com.library.management.system.exception;
 
-public class BookNotFoundException extends ApiException {
+public class InvalidBookException extends ApiException {
 
-    public BookNotFoundException(Integer statusCode) {
+    public InvalidBookException(Integer statusCode) {
         super("Book is not present for given id", statusCode);
     }
 }

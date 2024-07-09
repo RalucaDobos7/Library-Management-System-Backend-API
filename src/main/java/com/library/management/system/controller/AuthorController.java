@@ -1,8 +1,10 @@
 package com.library.management.system.controller;
 
 import com.library.management.system.dto.author.AuthorDTO;
+import com.library.management.system.dto.author.AuthorWithBooksDTO;
 import com.library.management.system.dto.author.UpdateAuthorDTO;
 import com.library.management.system.service.AuthorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +20,12 @@ public class AuthorController {
     private final AuthorService authorService;
 
     @PostMapping
-    public ResponseEntity<AuthorDTO> createAuthor(@RequestBody AuthorDTO author) {
+    public ResponseEntity<AuthorDTO> createAuthor(@Valid @RequestBody AuthorDTO author) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authorService.save(author));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AuthorDTO> updateAuthor(@RequestBody AuthorDTO authorDTO, @PathVariable String id) {
+    public ResponseEntity<AuthorDTO> updateAuthor(@Valid @RequestBody AuthorDTO authorDTO, @PathVariable String id) {
         return ResponseEntity.ok(authorService.update(id, authorDTO));
     }
 
@@ -39,12 +41,12 @@ public class AuthorController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<AuthorDTO>> getAllAuthors(Pageable page) {
+    public ResponseEntity<Page<AuthorWithBooksDTO>> getAllAuthors(Pageable page) {
         return ResponseEntity.ok(authorService.getAllAuthors(page));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable String id) {
-        return ResponseEntity.ok(authorService.getById(id));
+    public ResponseEntity<AuthorWithBooksDTO> getAuthorById(@PathVariable String id) {
+        return ResponseEntity.ok(authorService.getAuthorById(id));
     }
 }

@@ -9,11 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/books")
 @RequiredArgsConstructor
+@Validated
 public class BookController {
 
     private final BookService bookService;
@@ -24,12 +26,12 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable String id ,@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> updateBook(@PathVariable String id, @Valid @RequestBody BookDTO bookDTO) {
         return ResponseEntity.ok(bookService.update(id, bookDTO));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BookDTO> patchBook(@PathVariable String id ,@RequestBody UpdateBookDTO updateBookDTO) {
+    public ResponseEntity<BookDTO> patchBook(@PathVariable String id, @Valid @RequestBody UpdateBookDTO updateBookDTO) {
         return ResponseEntity.ok(bookService.patch(id, updateBookDTO));
     }
 

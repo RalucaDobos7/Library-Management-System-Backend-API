@@ -2,11 +2,13 @@ package com.library.management.system.dto.book;
 
 import com.library.management.system.validator.ISBN;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookDTO {
 
     private String id;

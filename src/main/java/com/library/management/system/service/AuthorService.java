@@ -1,11 +1,13 @@
 package com.library.management.system.service;
 
 import com.library.management.system.dto.author.AuthorDTO;
+import com.library.management.system.dto.author.AuthorWithBooksDTO;
 import com.library.management.system.dto.author.UpdateAuthorDTO;
 import com.library.management.system.entity.Author;
-import com.library.management.system.exception.AuthorNotFoundException;
+import com.library.management.system.exception.InvalidAuthorException;
 import com.library.management.system.mapper.AuthorMapper;
 import com.library.management.system.repository.AuthorRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +44,7 @@ public class AuthorService {
     }
 
     public AuthorDTO patch(String id, UpdateAuthorDTO authorDTO) {
-        var author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.NOT_FOUND.value()));
+        var author = authorRepository.findById(id).orElseThrow(() -> new InvalidAuthorException(HttpStatus.NOT_FOUND.value()));
 
         if (authorDTO.getBio() != null) {
             author.setBio(authorDTO.getBio());
@@ -57,13 +59,15 @@ public class AuthorService {
         authorRepository.deleteById(id);
     }
 
-    public Page<AuthorDTO> getAllAuthors(Pageable page) {
-        return authorRepository.findAll(page).map(authorMapper::toDTO);
+    @Transactional
+    public Page<AuthorWithBooksDTO> getAllAuthors(Pageable page) {
+        return authorRepository.findAll(page).map(authorMapper::toAuthorWIthBooksDTO);
     }
 
-    public AuthorDTO getById(String id) {
-        var author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.NOT_FOUND.value()));
+    @Transactional
+    public AuthorWithBooksDTO getAuthorById(String id) {
+        var author = authorRepository.findById(id).orElseThrow(() -> new InvalidAuthorException(HttpStatus.NOT_FOUND.value()));
 
-        return authorMapper.toDTO(author);
+        return authorMapper.toAuthorWIthBooksDTO(author);
     }
 }
