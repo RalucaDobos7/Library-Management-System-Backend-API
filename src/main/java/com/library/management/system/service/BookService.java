@@ -1,6 +1,7 @@
 package com.library.management.system.service;
 
-import com.library.management.system.dto.BookDTO;
+import com.library.management.system.dto.book.BookDTO;
+import com.library.management.system.dto.book.UpdateBookDTO;
 import com.library.management.system.entity.Book;
 import com.library.management.system.exception.AuthorNotFoundException;
 import com.library.management.system.exception.BookNotFoundException;
@@ -8,10 +9,10 @@ import com.library.management.system.mapper.BookMapper;
 import com.library.management.system.repository.AuthorRepository;
 import com.library.management.system.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +53,33 @@ public class BookService {
         return bookMapper.toDTO(bookRepository.save(book));
     }
 
+    public BookDTO patch(String bookId, UpdateBookDTO bookDTO) {
+        var book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(HttpStatus.NOT_FOUND.value()));
+
+        if (bookDTO.getTitle() != null) {
+            book.setTitle(bookDTO.getTitle());
+        }
+        if (bookDTO.getDescription() != null) {
+            book.setDescription(bookDTO.getDescription());
+        }
+        if (bookDTO.getIsbn() != null) {
+            book.setIsbn(bookDTO.getIsbn());
+        }
+
+        if (bookDTO.getAuthorId() != null) {
+            var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.BAD_REQUEST.value()));
+            book.setAuthor(author);
+        }
+
+        return bookMapper.toDTO(bookRepository.save(book));
+    }
+
     public void deleteById(String id) {
         bookRepository.deleteById(id);
     }
 
-    public List<BookDTO> getAllBooks() {
-        return bookRepository.findAll().stream().map(bookMapper::toDTO).toList();
+    public Page<BookDTO> getAllBooks(Pageable page) {
+        return bookRepository.findAll(page).map(bookMapper::toDTO);
     }
 
     public BookDTO getById(String id) {

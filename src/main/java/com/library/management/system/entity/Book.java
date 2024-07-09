@@ -21,7 +21,7 @@ public class Book {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "isbn")
+    @Column(name = "isbn", unique = true)
     private String isbn;
 
     @ManyToOne(fetch = FetchType.EAGER)

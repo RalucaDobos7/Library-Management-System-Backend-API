@@ -22,7 +22,7 @@ public class Author {
     @Column(name = "bio")
     private String bio;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", orphanRemoval = true)
     private Set<Book> books;
 
     @PrePersist

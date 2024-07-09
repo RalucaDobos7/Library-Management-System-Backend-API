@@ -1,6 +1,6 @@
 package com.library.management.system.mapper;
 
-import com.library.management.system.dto.AuthorDTO;
+import com.library.management.system.dto.author.AuthorDTO;
 import com.library.management.system.entity.Author;
 import org.mapstruct.Mapper;
 

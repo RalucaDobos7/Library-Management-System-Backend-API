@@ -1,15 +1,16 @@
 package com.library.management.system.service;
 
-import com.library.management.system.dto.AuthorDTO;
+import com.library.management.system.dto.author.AuthorDTO;
+import com.library.management.system.dto.author.UpdateAuthorDTO;
 import com.library.management.system.entity.Author;
 import com.library.management.system.exception.AuthorNotFoundException;
 import com.library.management.system.mapper.AuthorMapper;
 import com.library.management.system.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service
@@ -40,12 +41,24 @@ public class AuthorService {
         return authorMapper.toDTO(authorRepository.save(author));
     }
 
+    public AuthorDTO patch(String id, UpdateAuthorDTO authorDTO) {
+        var author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(HttpStatus.NOT_FOUND.value()));
+
+        if (authorDTO.getBio() != null) {
+            author.setBio(authorDTO.getBio());
+        }
+        if (authorDTO.getName() != null) {
+            author.setName(authorDTO.getName());
+        }
+        return authorMapper.toDTO(authorRepository.save(author));
+    }
+
     public void deleteById(String id) {
         authorRepository.deleteById(id);
     }
 
-    public List<AuthorDTO> getAllAuthors() {
-        return authorRepository.findAll().stream().map(authorMapper::toDTO).toList();
+    public Page<AuthorDTO> getAllAuthors(Pageable page) {
+        return authorRepository.findAll(page).map(authorMapper::toDTO);
     }
 
     public AuthorDTO getById(String id) {

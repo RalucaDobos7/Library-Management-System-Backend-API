@@ -1,6 +1,6 @@
 package com.library.management.system.mapper;
 
-import com.library.management.system.dto.BookDTO;
+import com.library.management.system.dto.book.BookDTO;
 import com.library.management.system.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
