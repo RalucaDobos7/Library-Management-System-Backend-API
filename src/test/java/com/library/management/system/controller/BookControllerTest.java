@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.library.management.system.dto.book.BookDTO;
 import com.library.management.system.dto.book.UpdateBookDTO;
 import com.library.management.system.exception.InvalidBookException;
+import com.library.management.system.exception.IsbnConflictException;
 import com.library.management.system.service.BookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +135,25 @@ class BookControllerTest {
                                 .content(new ObjectMapper().writeValueAsString(book))
                 )
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book is not present for given id"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book does not exist for given id"));
+    }
+
+    @Test
+    void patchBook_shouldReturnConflictStatus_whenIsbnAlreadyExists() throws Exception {
+        UpdateBookDTO book = new UpdateBookDTO();
+        book.setTitle("new_book_title");
+        book.setIsbn("978-0-596-52068-7");
+
+        when(bookService.patch(BOOK_ID, book)).thenThrow(new IsbnConflictException(HttpStatus.CONFLICT.value()));
+
+        mvc.perform(
+                        MockMvcRequestBuilders.patch("/books/" + BOOK_ID)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON_VALUE)
+                                .content(new ObjectMapper().writeValueAsString(book))
+                )
+                .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Given ISBN already exists"));
     }
 
     @Test
@@ -154,7 +173,7 @@ class BookControllerTest {
                         MockMvcRequestBuilders.delete("/books/" + BOOK_ID)
                 )
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book is not present for given id"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book does not exist for given id"));
     }
 
     @Test
@@ -181,6 +200,6 @@ class BookControllerTest {
                         MockMvcRequestBuilders.get("/books/" + BOOK_ID)
                 )
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book is not present for given id"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Book does not exist for given id"));
     }
 }

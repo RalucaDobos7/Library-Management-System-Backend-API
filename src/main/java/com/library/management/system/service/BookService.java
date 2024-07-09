@@ -5,6 +5,7 @@ import com.library.management.system.dto.book.UpdateBookDTO;
 import com.library.management.system.entity.Book;
 import com.library.management.system.exception.InvalidAuthorException;
 import com.library.management.system.exception.InvalidBookException;
+import com.library.management.system.exception.IsbnConflictException;
 import com.library.management.system.mapper.BookMapper;
 import com.library.management.system.repository.AuthorRepository;
 import com.library.management.system.repository.BookRepository;
@@ -24,7 +25,7 @@ public class BookService {
 
     public BookDTO save(BookDTO bookDTO) {
         var author = authorRepository.findById(bookDTO.getAuthorId()).orElseThrow(() -> new InvalidAuthorException(HttpStatus.BAD_REQUEST.value()));
-
+        checkDuplicateIsbn(bookDTO.getIsbn());
         var book = bookMapper.toEntity(bookDTO);
         book.setAuthor(author);
 
@@ -43,9 +44,13 @@ public class BookService {
             book = bookOptional.get();
             book.setTitle(bookDTO.getTitle());
             book.setDescription(bookDTO.getDescription());
+            if(!bookDTO.getIsbn().equals(book.getIsbn())) {
+                checkDuplicateIsbn(bookDTO.getIsbn());
+            }
             book.setIsbn(bookDTO.getIsbn());
             book.setAuthor(author);
         } else {
+            checkDuplicateIsbn(bookDTO.getIsbn());
             book = bookMapper.toEntity(bookDTO);
             book.setId(bookId);
             book.setAuthor(author);
@@ -63,6 +68,7 @@ public class BookService {
             book.setDescription(bookDTO.getDescription());
         }
         if (bookDTO.getIsbn() != null) {
+            checkDuplicateIsbn(bookDTO.getIsbn());
             book.setIsbn(bookDTO.getIsbn());
         }
 
@@ -85,5 +91,11 @@ public class BookService {
     public BookDTO getById(String id) {
         var book = bookRepository.findById(id).orElseThrow(() -> new InvalidBookException(HttpStatus.NOT_FOUND.value()));
         return bookMapper.toDTO(book);
+    }
+
+    private void checkDuplicateIsbn(String isbn) {
+        if(bookRepository.existsByIsbn(isbn)) {
+            throw new IsbnConflictException(HttpStatus.CONFLICT.value());
+        }
     }
 }
