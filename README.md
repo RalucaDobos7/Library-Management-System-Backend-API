@@ -41,3 +41,10 @@ A Library Management System that allows users to store information about an Auth
 5. **Info**
 
    In order to run tests, Docker is required.
+
+
+6. **Swagger**
+
+   
+   http://localhost:8080/api/v1/swagger-ui-library-management-system
+
